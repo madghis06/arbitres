@@ -7,319 +7,322 @@
 <style>
   * { box-sizing: border-box; }
   body { font-family: system-ui, sans-serif; margin: 0; background: #f2f5f4; color: #1b2a25; }
-  header { background: #0b6b4d; color: white; padding: 16px; text-align: center; font-size: 20px; font-weight: bold; }
-  .tabs { display: flex; }
-  .tabs button { flex: 1; padding: 14px 4px; border: none; background: #d8e5df; font-size: 15px; cursor: pointer; }
+  header { background: #0b6b4d; color: white; padding: 14px; text-align: center; font-size: 19px; font-weight: bold; }
+  .tabs { display: flex; flex-wrap: wrap; }
+  .tabs button { flex: 1; min-width: 20%; padding: 12px 2px; border: none; background: #d8e5df; font-size: 13px; cursor: pointer; }
   .tabs button.active { background: white; font-weight: bold; border-bottom: 3px solid #0b6b4d; }
-  main { max-width: 640px; margin: 0 auto; padding: 16px; }
-  .card { background: white; border-radius: 10px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  main { max-width: 720px; margin: 0 auto; padding: 14px; }
+  .card { background: white; border-radius: 10px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
   label { display: block; margin: 10px 0 4px; font-weight: 600; }
-  input, select { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #b9c7c1; border-radius: 8px; background: white; }
-  .btn { margin-top: 14px; width: 100%; padding: 13px; background: #0b6b4d; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
-  .btn.small { width: auto; padding: 6px 10px; margin: 8px 0 0 0; font-size: 14px; }
+  input, select { width: 100%; padding: 11px; font-size: 16px; border: 1px solid #b9c7c1; border-radius: 8px; background: white; }
+  .chk { display: inline-block; margin: 4px 10px 0 0; font-weight: normal; }
+  .chk input { width: auto; }
+  .btn { margin-top: 12px; width: 100%; padding: 12px; background: #0b6b4d; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+  .btn.small { width: auto; padding: 6px 10px; margin: 0; font-size: 14px; }
   .btn.danger { background: #b3261e; }
   .btn.wa { background: #1f9d55; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e3ebe7; gap: 8px; }
-  .row:last-child { border-bottom: none; }
-  .match { padding: 12px 0; border-bottom: 1px solid #e3ebe7; }
-  .match:last-child { border-bottom: none; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #e3ebe7; gap: 8px; }
+  .ligne { padding: 8px 0; border-top: 1px solid #e3ebe7; }
+  .ligne select { margin-top: 6px; }
   .titre { font-size: 17px; font-weight: bold; }
-  .dist { font-weight: bold; color: #0b6b4d; white-space: nowrap; }
   .muted { color: #6a7b74; font-size: 14px; }
   .hidden { display: none; }
+  .scroll { overflow-x: auto; }
+  .feuille { width: 100%; border-collapse: collapse; font-size: 13px; text-transform: uppercase; }
+  .feuille th, .feuille td { border: 1px solid #000; padding: 4px; text-align: center; }
+  .feuille th { background: #eee; }
+  .tf { text-align: center; font-weight: bold; margin: 8px 0; }
+  @media print { header, .tabs, .noprint { display: none !important; } body { background: white; } .card { box-shadow: none; padding: 0; } }
 </style>
 </head>
 <body>
 <header>⚽ Désignations arbitres - Béjaïa</header>
 <div class='tabs'>
-  <button id='tabRencontres' class='active' onclick='showTab(0)'>Rencontres</button>
-  <button id='tabClubs' onclick='showTab(1)'>Clubs</button>
-  <button id='tabArbitres' onclick='showTab(2)'>Arbitres</button>
+  <button id='tJournee' class='active' onclick='showTab(0)'>Journée</button>
+  <button id='tClubs' onclick='showTab(1)'>Clubs</button>
+  <button id='tStades' onclick='showTab(2)'>Stades</button>
+  <button id='tArbitres' onclick='showTab(3)'>Arbitres</button>
+  <button id='tCategories' onclick='showTab(4)'>Catégories</button>
 </div>
 
 <main>
-  <!-- ONGLET RENCONTRES -->
-  <section id='Rencontres'>
-    <div class='card'>
-      <strong>Nouvelle rencontre</strong>
-      <div class='grid'>
-        <div><label for='dom'>Club recevant</label><select id='dom' onchange='choisirStadeDuClub()'></select></div>
-        <div><label for='ext'>Club visiteur</label><select id='ext'></select></div>
-      </div>
+  <section id='Journee'>
+    <div class='card noprint'>
+      <b>Journée</b>
+      <label for='date'>Date</label>
+      <input id='date' type='date' onchange='rMatchs()'>
+    </div>
+    <div class='card noprint'>
+      <b>Nouvelle rencontre</b>
       <label for='stade'>Stade</label>
       <select id='stade'></select>
       <div class='grid'>
-        <div><label for='date'>Date</label><input id='date' type='date'></div>
-        <div><label for='heure'>Heure</label><input id='heure' type='time' value='15:00'></div>
+        <div><label for='dom'>Club recevant</label><select id='dom'></select></div>
+        <div><label for='ext'>Club visiteur</label><select id='ext'></select></div>
       </div>
-      <label for='nb'>Nombre d'arbitres à désigner</label>
-      <select id='nb'><option>1</option><option>2</option><option selected>3</option><option>4</option></select>
-      <button class='btn' onclick='creerRencontre()'>Désigner les arbitres</button>
+      <label for='g'>Groupe (G)</label>
+      <input id='g' type='text' placeholder='Ex : 1, 2, A, B'>
+      <button class='btn' onclick='creerMatch()'>Créer la rencontre</button>
     </div>
+    <div id='matchs' class='noprint'></div>
     <div class='card'>
-      <strong>Liste des désignations</strong>
-      <div id='liste' class='muted'></div>
-      <div id='actions' class='hidden'>
-        <button class='btn' onclick='copierListe()'>Copier la liste</button>
+      <div class='noprint'><b>Feuille de désignation</b></div>
+      <div id='feuille' class='scroll'></div>
+      <div id='actions' class='noprint hidden'>
+        <button class='btn' onclick='window.print()'>Imprimer / enregistrer en PDF</button>
+        <button class='btn' onclick='copierListe()'>Copier le texte</button>
         <button class='btn wa' onclick='whatsapp()'>Envoyer sur WhatsApp</button>
       </div>
     </div>
   </section>
 
-  <!-- ONGLET CLUBS -->
   <section id='Clubs' class='hidden'>
     <div class='card'>
-      <strong>Ajouter un club</strong>
+      <b>Ajouter un club</b>
       <label for='nomClub'>Nom du club</label>
       <input id='nomClub' type='text' placeholder='Ex : MOB'>
-      <label for='stadeClub'>Stade habituel (facultatif)</label>
-      <select id='stadeClub'></select>
-      <button class='btn' onclick='ajouterClub()'>Enregistrer</button>
+      <button class='btn' onclick='addClub()'>Enregistrer</button>
+      <p class='muted'>Le club reçoit toutes les catégories. Décoche celles qu'il n'a pas dans la liste ci-dessous.</p>
     </div>
-    <div class='card'>
-      <strong>Liste des clubs</strong>
-      <div id='listeClubs'></div>
-    </div>
+    <div class='card'><b>Liste des clubs</b><div id='listeClubs'></div></div>
   </section>
 
-  <!-- ONGLET ARBITRES -->
+  <section id='Stades' class='hidden'>
+    <div class='card'>
+      <b>Ajouter un stade à une commune</b>
+      <label for='communeStade'>Commune</label>
+      <select id='communeStade'></select>
+      <label for='nomStade'>Nom du stade</label>
+      <input id='nomStade' type='text' placeholder='Ex : Benal Principal'>
+      <button class='btn' onclick='addStade()'>Enregistrer</button>
+    </div>
+    <div class='card'><b>Liste des stades</b><div id='listeStades'></div></div>
+  </section>
+
   <section id='Arbitres' class='hidden'>
     <div class='card'>
-      <strong>Ajouter un arbitre</strong>
+      <b>Ajouter un arbitre</b>
       <label for='nom'>Nom et prénom</label>
       <input id='nom' type='text' placeholder='Ex : Karim Benali'>
-      <label for='commune'>Commune de résidence</label>
-      <select id='commune'></select>
-      <button class='btn' onclick='ajouterArbitre()'>Enregistrer</button>
+      <label for='communeArb'>Commune de résidence</label>
+      <select id='communeArb'></select>
+      <button class='btn' onclick='addArb()'>Enregistrer</button>
     </div>
+    <div class='card'><b>Liste des arbitres</b><div id='listeArbitres'></div></div>
+  </section>
+
+  <section id='Categories' class='hidden'>
     <div class='card'>
-      <strong>Liste des arbitres</strong>
-      <div id='listeArbitres'></div>
+      <b>Ajouter une catégorie</b>
+      <label for='nomCat'>Nom</label>
+      <input id='nomCat' type='text' placeholder='Ex : U13'>
+      <div class='grid'>
+        <div><label for='nbCat'>Arbitres par match</label><select id='nbCat'><option selected>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        <div><label for='dureeCat'>Durée</label><input id='dureeCat' type='text' placeholder='Ex : 2x40'></div>
+      </div>
+      <button class='btn' onclick='addCat()'>Enregistrer</button>
     </div>
+    <div class='card'><b>Liste des catégories</b><div id='listeCats'></div></div>
   </section>
 </main>
 
 <script>
-// Coordonnées approximatives (latitude, longitude). À vérifier et corriger si besoin.
-const COMMUNES = {
-  'Béjaïa centre': [36.7509, 5.0567],
-  'Oued Ghir': [36.7000, 5.0000],
-  'Tichy': [36.6750, 5.0990],
-  'Aokas': [36.6430, 5.2490],
-  'Souk El Tenine': [36.6900, 5.3000],
-  'Amizour': [36.6400, 4.9010],
-  'El Kseur': [36.6800, 4.8450],
-  'Barbacha': [36.6000, 4.8800],
-  'Akbou': [36.4570, 4.5330],
-  'Sidi Aïch': [36.6100, 4.6860],
-  'Seddouk': [36.5200, 4.6700],
-  'Kherrata': [36.4950, 5.2700],
-  'Timezrit': [36.6000, 4.7500],
-  'Toudja': [36.6900, 5.0000],
-  'Tazmalt': [36.3900, 4.4100],
-  'Melbou': [36.6350, 5.3600]
-};
-
-// Coordonnées approximatives des stades. À modifier avec les vrais stades.
-const STADES = {
-  'Stade de l’Unité Maghrébine (Béjaïa)': [36.7440, 5.0750],
-  'Stade Léo Lagrange (Béjaïa)': [36.7530, 5.0600],
-  'Stade d’Amizour': [36.6420, 4.9030],
-  'Stade d’El Kseur': [36.6820, 4.8480],
-  'Stade d’Akbou': [36.4600, 4.5360],
-  'Stade de Sidi Aïch': [36.6130, 4.6890],
-  'Stade d’Aokas': [36.6460, 5.2520],
-  'Stade de Kherrata': [36.4980, 5.2730]
-};
+// Les 52 communes de la wilaya de Béjaïa [latitude, longitude].
+// Positions approximatives (base de données libre) : quelques km d'écart possibles.
+const COMMUNES = {'Béjaïa':[36.751,5.057],'Amizour':[36.643,4.868],'Ferraoun':[36.565,4.842],'Taourirt Ighil':[36.733,4.671],'Chellata':[36.508,4.489],'Tamokra':[36.392,4.581],'Timezrit':[36.616,4.734],'Souk El Ténine':[36.615,5.278],'M’cisna':[36.565,4.692],'Tinabdher':[36.633,4.665],'Tichy':[36.62,5.094],'Semaoun':[36.616,4.803],'Kendira':[36.557,4.948],'Tifra':[36.663,4.651],'Ighram':[36.477,4.392],'Amalou':[36.478,4.567],'Ighil Ali':[36.291,4.435],'Fenaïa Ilmaten':[36.667,4.748],'Toudja':[36.786,4.721],'Darguina':[36.554,5.306],'Sidi Ayad':[36.61,4.696],'Aokas':[36.62,5.204],'Beni Djellil':[36.563,4.764],'Adekar':[36.734,4.542],'Akbou':[36.458,4.464],'Seddouk':[36.537,4.641],'Tazmalt':[36.398,4.389],'Aït-R’zine':[36.387,4.465],'Chemini':[36.593,4.56],'Souk Oufella':[36.588,4.599],'Taskriout':[36.557,5.224],'Tibane':[36.613,4.636],'Tala Hamza':[36.69,4.943],'Barbacha':[36.563,4.886],'Beni Ksila':[36.828,4.631],'Ouzellaguen':[36.547,4.508],'Bouhamza':[36.439,4.57],'Beni Mellikeche':[36.448,4.385],'Sidi Aïch':[36.622,4.679],'El Kseur':[36.719,4.768],'Melbou':[36.622,5.351],'Akfadou':[36.658,4.575],'Leflaye':[36.598,4.644],'Kherrata':[36.472,5.205],'Draâ El-Kaïd':[36.441,5.168],'Tamridjet':[36.573,5.378],'Aït Smail':[36.554,5.189],'Boukhelifa':[36.637,5.006],'Tizi N’Berber':[36.59,5.131],'Beni Maouche':[36.488,4.721],'Oued Ghir':[36.715,4.909],'Boudjellil':[36.322,4.348]};
 
 const NL = String.fromCharCode(10);
-const ONGLETS = ['Rencontres', 'Clubs', 'Arbitres'];
+const $ = id => document.getElementById(id);
+const esc = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+const L = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+const S = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+const cats = () => L('cats', [{ n: 'U20', nb: 3, d: '2x45' }, { n: 'U17', nb: 1, d: '2x40' }, { n: 'U15', nb: 1, d: '2x30' }]);
+const clubs = () => L('clubs2', [{ n: 'MOB', c: ['U20', 'U17', 'U15'] }, { n: 'GSMB', c: ['U20', 'U17', 'U15'] }]);
+const stades = () => L('stades2', []);
+const arbs = () => L('arbitres2', []);
+const matchs = () => L('matchs2', []);
+const KEYS = ['clubs2', 'stades2', 'arbitres2', 'cats', 'matchs2'];
+const GET = [clubs, stades, arbs, cats, matchs];
+const T = ['Journee', 'Clubs', 'Stades', 'Arbitres', 'Categories'];
+const OC = Object.keys(COMMUNES).sort((a, b) => a.localeCompare(b, 'fr')).map(c => `<option>${esc(c)}</option>`).join('');
+let cur = 0;
 
-function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-
-function distanceKm(a, b) {
-  const R = 6371, rad = Math.PI / 180;
-  const dLat = (b[0] - a[0]) * rad, dLon = (b[1] - a[1]) * rad;
-  const x = Math.sin(dLat / 2) ** 2 +
-            Math.cos(a[0] * rad) * Math.cos(b[0] * rad) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(x));
+function dist(a, b) {
+  const r = Math.PI / 180, dLat = (b[0] - a[0]) * r, dLon = (b[1] - a[1]) * r;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLon / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(x));
 }
-
-function lire(cle, defaut) {
-  try { return JSON.parse(localStorage.getItem(cle)) || defaut; } catch (e) { return defaut; }
-}
-function ecrire(cle, v) { localStorage.setItem(cle, JSON.stringify(v)); }
-function getArbitres() { return lire('arbitres', []); }
-function getClubs() { return lire('clubs', [{ nom: 'MOB', stade: '' }, { nom: 'GSMB', stade: '' }]); }
-function getMatchs() { return lire('matchs', []); }
-
-function dateFr(d) {
-  return new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-function remplirListes() {
-  const optClubs = getClubs().map((c, i) => `<option value='${i}'>${esc(c.nom)}</option>`).join('');
-  document.getElementById('dom').innerHTML = optClubs;
-  document.getElementById('ext').innerHTML = optClubs;
-  if (getClubs().length > 1) document.getElementById('ext').value = '1';
-  const optStades = Object.keys(STADES).map(s => `<option>${esc(s)}</option>`).join('');
-  document.getElementById('stade').innerHTML = optStades;
-  document.getElementById('stadeClub').innerHTML = `<option value=''>Aucun</option>` + optStades;
-  document.getElementById('commune').innerHTML =
-    Object.keys(COMMUNES).map(c => `<option>${esc(c)}</option>`).join('');
-  choisirStadeDuClub();
-}
-
-function choisirStadeDuClub() {
-  const club = getClubs()[document.getElementById('dom').value];
-  if (club && club.stade) document.getElementById('stade').value = club.stade;
-}
+function dateFr(d) { return new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
+function hr(h) { return String(h).replace(':', 'H'); }
+function del(k, i) { const l = GET[k](); l.splice(i, 1); S(KEYS[k], l); showTab(cur); }
+function vide(t) { return `<p class='muted'>${t}</p>`; }
 
 function showTab(n) {
-  ONGLETS.forEach((o, i) => {
-    document.getElementById(o).classList.toggle('hidden', i !== n);
-    document.getElementById('tab' + o).classList.toggle('active', i === n);
-  });
-  if (n === 0) { remplirListes(); afficherMatchs(); }
-  if (n === 1) afficherClubs();
-  if (n === 2) afficherArbitres();
+  cur = n;
+  T.forEach((o, i) => { $(o).classList.toggle('hidden', i !== n); $('t' + o).classList.toggle('active', i === n); });
+  [rJournee, rClubs, rStades, rArbitres, rCats][n]();
 }
 
 /* ---------- CLUBS ---------- */
-function ajouterClub() {
-  const nom = document.getElementById('nomClub').value.trim();
-  const stade = document.getElementById('stadeClub').value;
-  if (!nom) { alert('Entre le nom du club.'); return; }
-  const l = getClubs();
-  l.push({ nom, stade });
-  ecrire('clubs', l);
-  document.getElementById('nomClub').value = '';
-  afficherClubs();
+function addClub() {
+  const n = $('nomClub').value.trim();
+  if (!n) { alert('Entre le nom du club.'); return; }
+  const l = clubs(); l.push({ n, c: cats().map(x => x.n) }); S('clubs2', l);
+  $('nomClub').value = ''; showTab(1);
+}
+function majClub(i, j) {
+  const l = clubs(), n = cats()[j].n, c = l[i].c;
+  if (c.includes(n)) c.splice(c.indexOf(n), 1); else c.push(n);
+  S('clubs2', l);
+}
+function rClubs() {
+  $('listeClubs').innerHTML = clubs().map((c, i) =>
+    `<div class='row'><div><b>${esc(c.n)}</b><br>` +
+    cats().map((k, j) => `<label class='chk'><input type='checkbox' onchange='majClub(${i},${j})' ${c.c.includes(k.n) ? 'checked' : ''}> ${esc(k.n)}</label>`).join('') +
+    `</div><button class='btn small danger' onclick='del(0,${i})'>Supprimer</button></div>`).join('') || vide('Aucun club.');
 }
 
-function supprimerClub(i) {
-  const l = getClubs();
-  l.splice(i, 1);
-  ecrire('clubs', l);
-  afficherClubs();
+/* ---------- STADES ---------- */
+function addStade() {
+  const nom = $('nomStade').value.trim();
+  if (!nom) { alert('Entre le nom du stade.'); return; }
+  const l = stades(); l.push({ commune: $('communeStade').value, nom }); S('stades2', l);
+  $('nomStade').value = ''; showTab(2);
 }
-
-function afficherClubs() {
-  const l = getClubs();
-  const div = document.getElementById('listeClubs');
-  if (!l.length) { div.innerHTML = `<p class='muted'>Aucun club enregistré.</p>`; return; }
-  div.innerHTML = l.map((c, i) =>
-    `<div class='row'><div><strong>${esc(c.nom)}</strong><br><span class='muted'>${c.stade ? esc(c.stade) : 'Pas de stade habituel'}</span></div>` +
-    `<button class='btn small danger' onclick='supprimerClub(${i})'>Supprimer</button></div>`).join('');
+function rStades() {
+  const v = $('communeStade').value;
+  $('communeStade').innerHTML = OC;
+  if (v) $('communeStade').value = v;
+  const l = stades().map((s, i) => ({ s, i })).sort((a, b) => a.s.commune.localeCompare(b.s.commune, 'fr'));
+  $('listeStades').innerHTML = l.map(({ s, i }) =>
+    `<div class='row'><div><b>${esc(s.nom)}</b><br><span class='muted'>${esc(s.commune)}</span></div><button class='btn small danger' onclick='del(1,${i})'>Supprimer</button></div>`).join('') || vide('Aucun stade. Choisis une commune et ajoute son stade.');
 }
 
 /* ---------- ARBITRES ---------- */
-function ajouterArbitre() {
-  const nom = document.getElementById('nom').value.trim();
-  const commune = document.getElementById('commune').value;
+function addArb() {
+  const nom = $('nom').value.trim();
   if (!nom) { alert('Entre un nom.'); return; }
-  const l = getArbitres();
-  l.push({ nom, commune });
-  ecrire('arbitres', l);
-  document.getElementById('nom').value = '';
-  afficherArbitres();
+  const l = arbs(); l.push({ nom, commune: $('communeArb').value }); S('arbitres2', l);
+  $('nom').value = ''; showTab(3);
+}
+function rArbitres() {
+  const v = $('communeArb').value;
+  $('communeArb').innerHTML = OC;
+  if (v) $('communeArb').value = v;
+  $('listeArbitres').innerHTML = arbs().map((a, i) =>
+    `<div class='row'><div><b>${esc(a.nom)}</b><br><span class='muted'>${esc(a.commune)}</span></div><button class='btn small danger' onclick='del(2,${i})'>Supprimer</button></div>`).join('') || vide('Aucun arbitre enregistré.');
 }
 
-function supprimerArbitre(i) {
-  const l = getArbitres();
-  l.splice(i, 1);
-  ecrire('arbitres', l);
-  afficherArbitres();
+/* ---------- CATEGORIES ---------- */
+function addCat() {
+  const n = $('nomCat').value.trim().toUpperCase();
+  if (!n) { alert('Entre le nom de la catégorie (ex : U13).'); return; }
+  const l = cats(); l.push({ n, nb: parseInt($('nbCat').value), d: $('dureeCat').value.trim() || '2x40' }); S('cats', l);
+  $('nomCat').value = ''; showTab(4);
+}
+function rCats() {
+  $('listeCats').innerHTML = cats().map((c, i) =>
+    `<div class='row'><div><b>${esc(c.n)}</b><br><span class='muted'>${c.nb} arbitre(s) - durée ${esc(c.d)}</span></div><button class='btn small danger' onclick='del(3,${i})'>Supprimer</button></div>`).join('') || vide('Aucune catégorie.');
 }
 
-function afficherArbitres() {
-  const l = getArbitres();
-  const div = document.getElementById('listeArbitres');
-  if (!l.length) { div.innerHTML = `<p class='muted'>Aucun arbitre enregistré.</p>`; return; }
-  div.innerHTML = l.map((a, i) =>
-    `<div class='row'><div><strong>${esc(a.nom)}</strong><br><span class='muted'>${esc(a.commune)}</span></div>` +
-    `<button class='btn small danger' onclick='supprimerArbitre(${i})'>Supprimer</button></div>`).join('');
+/* ---------- JOURNEE ---------- */
+function rJournee() {
+  $('stade').innerHTML = stades().map((s, i) => `<option value='${i}'>${esc(s.nom)} (${esc(s.commune)})</option>`).join('');
+  const o = clubs().map(c => `<option>${esc(c.n)}</option>`).join('');
+  $('dom').innerHTML = o; $('ext').innerHTML = o;
+  if (clubs().length > 1) $('ext').selectedIndex = 1;
+  rMatchs();
 }
 
-/* ---------- RENCONTRES ---------- */
-function creerRencontre() {
-  const clubs = getClubs();
-  const dom = clubs[document.getElementById('dom').value];
-  const ext = clubs[document.getElementById('ext').value];
-  const stade = document.getElementById('stade').value;
-  const date = document.getElementById('date').value;
-  const heure = document.getElementById('heure').value;
-  const nb = parseInt(document.getElementById('nb').value);
-  if (!dom || !ext) { alert(`Ajoute d'abord les clubs.`); return; }
-  if (dom.nom === ext.nom) { alert('Choisis deux clubs différents.'); return; }
-  if (!date) { alert('Choisis la date.'); return; }
-
-  const matchs = getMatchs();
-  // Un arbitre déjà désigné ce jour-là n'est pas proposé une 2e fois
-  const pris = [];
-  matchs.filter(m => m.date === date).forEach(m => m.arbitres.forEach(a => pris.push(a.nom)));
-  const dispo = getArbitres()
-    .filter(a => !pris.includes(a.nom))
-    .map(a => ({ nom: a.nom, commune: a.commune, km: distanceKm(COMMUNES[a.commune], STADES[stade]) }))
-    .sort((x, y) => x.km - y.km);
-  if (!dispo.length) { alert(`Aucun arbitre disponible ce jour-là. Ajoute des arbitres dans l'onglet Arbitres.`); return; }
-
-  matchs.push({ dom: dom.nom, ext: ext.nom, stade, date, heure, arbitres: dispo.slice(0, nb) });
-  ecrire('matchs', matchs);
-  afficherMatchs();
+function creerMatch() {
+  const st = stades()[$('stade').value];
+  const dom = $('dom').value, ext = $('ext').value;
+  if (!st) { alert(`Ajoute d'abord un stade dans l'onglet Stades.`); return; }
+  if (!dom || !ext || dom === ext) { alert('Choisis deux clubs différents.'); return; }
+  const l = matchs();
+  l.push({ date: $('date').value, commune: st.commune, stade: st.nom, dom, ext, g: $('g').value.trim(), l: [] });
+  S('matchs2', l); rMatchs();
+}
+function supM(i) { const l = matchs(); l.splice(i, 1); S('matchs2', l); rMatchs(); }
+function addL(i) {
+  const l = matchs(), c = $('nc' + i).value, cat = cats().find(x => x.n === c);
+  if (!cat) return;
+  l[i].l.push({ c, h: $('nh' + i).value, a: Array(cat.nb).fill('') });
+  S('matchs2', l); rMatchs();
+}
+function supL(i, j) { const l = matchs(); l[i].l.splice(j, 1); S('matchs2', l); rMatchs(); }
+function choisir(i, j, k, v) {
+  const l = matchs();
+  l[i].l[j].a[k] = v === '' ? '' : arbs()[v].nom;
+  S('matchs2', l); feuille();
 }
 
-function supprimerMatch(i) {
-  const l = getMatchs();
-  l.splice(i, 1);
-  ecrire('matchs', l);
-  afficherMatchs();
+function opts(m, sel) {
+  const p = COMMUNES[m.commune];
+  const l = arbs().map((a, i) => ({ i, a, k: p && COMMUNES[a.commune] ? dist(COMMUNES[a.commune], p) : 999 })).sort((x, y) => x.k - y.k);
+  return `<option value=''>— choisir un arbitre —</option>` + l.map(x =>
+    `<option value='${x.i}' ${x.a.nom === sel ? 'selected' : ''}>${esc(x.a.nom)} (${esc(x.a.commune)}) ${x.k < 999 ? x.k.toFixed(0) + ' km' : ''}</option>`).join('');
 }
 
-function matchsTries() {
-  return getMatchs().map((m, i) => ({ ...m, i }))
-    .sort((a, b) => (a.date + a.heure).localeCompare(b.date + b.heure));
+function carte(m, i) {
+  const cl = clubs(), a = cl.find(c => c.n === m.dom), b = cl.find(c => c.n === m.ext);
+  const dispo = cats().filter(c => (!a || a.c.includes(c.n)) && (!b || b.c.includes(c.n)) && !m.l.some(x => x.c === c.n));
+  return `<div class='card'><div class='row'><div><div class='titre'>${esc(m.dom)} — ${esc(m.ext)}${m.g ? ' (G ' + esc(m.g) + ')' : ''}</div>` +
+    `<div class='muted'>📍 ${esc(m.stade)} (${esc(m.commune)})</div></div><button class='btn small danger' onclick='supM(${i})'>Supprimer</button></div>` +
+    m.l.map((x, j) => `<div class='ligne'><b>${esc(x.c)}</b> à ${hr(x.h)} <button class='btn small danger' onclick='supL(${i},${j})'>✕</button>` +
+      x.a.map((s, k) => `<select onchange='choisir(${i},${j},${k},this.value)'>${opts(m, s)}</select>`).join('') + `</div>`).join('') +
+    (dispo.length ? `<div class='ligne'><div class='grid'><select id='nc${i}'>${dispo.map(c => `<option>${esc(c.n)}</option>`).join('')}</select><input id='nh${i}' type='time' value='10:00'></div><button class='btn small' onclick='addL(${i})'>+ Ajouter cette catégorie</button></div>` : '') + `</div>`;
 }
 
-function afficherMatchs() {
-  const l = matchsTries();
-  const div = document.getElementById('liste');
-  document.getElementById('actions').classList.toggle('hidden', !l.length);
-  if (!l.length) { div.innerHTML = 'Aucune rencontre pour le moment.'; return; }
-  div.innerHTML = l.map(m =>
-    `<div class='match'><div class='titre'>${esc(m.dom)} - ${esc(m.ext)}</div>` +
-    `<div class='muted'>📍 ${esc(m.stade)}<br>📅 ${dateFr(m.date)} à ${esc(m.heure)}</div>` +
-    m.arbitres.map(a =>
-      `<div class='row'><span>${esc(a.nom)} <span class='muted'>(${esc(a.commune)})</span></span><span class='dist'>${a.km.toFixed(1)} km</span></div>`).join('') +
-    `<button class='btn small danger' onclick='supprimerMatch(${m.i})'>Supprimer la rencontre</button></div>`).join('');
+function rMatchs() {
+  const d = $('date').value;
+  const l = matchs().map((m, i) => ({ m, i })).filter(x => x.m.date === d);
+  $('matchs').innerHTML = l.map(x => carte(x.m, x.i)).join('') || vide('Aucune rencontre ce jour-là.');
+  feuille();
 }
 
-function texteListe() {
-  return 'DÉSIGNATIONS DES ARBITRES' + NL + NL + matchsTries().map(m =>
-    m.dom + ' - ' + m.ext + NL +
-    'Stade : ' + m.stade + NL +
-    'Date : ' + dateFr(m.date) + ' à ' + m.heure + NL +
-    'Arbitres : ' + m.arbitres.map(a => a.nom).join(', ')
-  ).join(NL + NL);
+function feuille() {
+  const d = $('date').value;
+  const ms = matchs().filter(m => m.date === d && m.l.length);
+  $('actions').classList.toggle('hidden', !ms.length);
+  if (!ms.length) { $('feuille').innerHTML = vide(`La feuille apparaît ici dès qu'une rencontre a une catégorie.`); return; }
+  const gr = {};
+  ms.forEach(m => { (gr[m.commune + '|' + m.stade] = gr[m.commune + '|' + m.stade] || []).push(m); });
+  let h = `<div class='tf'>LIGUE DE FOOTBALL DE LA WILAYA DE BÉJAÏA<br>DIRECTION TECHNIQUE D'ARBITRAGE DE WILAYA</div>` +
+    `<div class='tf'>DÉSIGNATION ${dateFr(d).toUpperCase()}</div><table class='feuille'><tr><th>LIEUX</th><th>RENCONTRE</th><th>G</th><th>CAT</th><th>HOR</th><th>ARBITRES</th></tr>`;
+  Object.values(gr).forEach(g => {
+    const total = g.reduce((s, m) => s + m.l.length, 0);
+    let premier = true;
+    g.forEach(m => {
+      m.l.slice().sort((a, b) => a.h.localeCompare(b.h)).forEach((x, n) => {
+        h += '<tr>' + (premier ? `<td rowspan='${total}'>${esc(m.stade)}</td>` : '') +
+          (n === 0 ? `<td rowspan='${m.l.length}'>${esc(m.dom)} — ${esc(m.ext)}</td>` : '') +
+          `<td>${esc(m.g)}</td><td>${esc(x.c)}</td><td>${hr(x.h)}</td><td>${esc(x.a.filter(Boolean).join(' — '))}</td></tr>`;
+        premier = false;
+      });
+    });
+  });
+  const dur = cats().filter(c => ms.some(m => m.l.some(x => x.c === c.n))).map(c => c.n + ' ' + c.d).join(' ; ');
+  $('feuille').innerHTML = h + `</table><p><b>NB : durée des rencontres : ${esc(dur)}</b></p>`;
 }
 
+function texte() {
+  const d = $('date').value;
+  const ms = matchs().filter(m => m.date === d && m.l.length);
+  return 'DÉSIGNATION ' + dateFr(d).toUpperCase() + NL + ms.map(m =>
+    NL + '📍 ' + m.stade + NL + '⚽ ' + m.dom + ' — ' + m.ext + (m.g ? ' (G ' + m.g + ')' : '') + NL +
+    m.l.map(x => x.c + ' ' + hr(x.h) + ' : ' + x.a.filter(Boolean).join(' — ')).join(NL)).join(NL);
+}
 function copierListe() {
-  const t = texteListe();
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(t).then(() => alert('Liste copiée !')).catch(() => prompt('Copie la liste :', t));
-  } else {
-    prompt('Copie la liste :', t);
-  }
+  const t = texte();
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => alert('Texte copié !')).catch(() => prompt('Copie le texte :', t));
+  else prompt('Copie le texte :', t);
 }
+function whatsapp() { window.open('https://wa.me/?text=' + encodeURIComponent(texte()), '_blank'); }
 
-function whatsapp() {
-  window.open('https://wa.me/?text=' + encodeURIComponent(texteListe()), '_blank');
-}
-
-document.getElementById('date').value = new Date().toISOString().slice(0, 10);
-remplirListes();
-afficherMatchs();
+$('date').value = new Date().toISOString().slice(0, 10);
+showTab(0);
 </script>
 </body>
 </html>
