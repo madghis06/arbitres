@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Désignations arbitres - Béjaïa</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; margin: 0; background: #f2f5f4; color: #1b2a25; }
+  header { background: #0b6b4d; color: white; padding: 16px; text-align: center; font-size: 20px; font-weight: bold; }
+  .tabs { display: flex; }
+  .tabs button { flex: 1; padding: 14px; border: none; background: #d8e5df; font-size: 16px; cursor: pointer; }
+  .tabs button.active { background: white; font-weight: bold; border-bottom: 3px solid #0b6b4d; }
+  main { max-width: 640px; margin: 0 auto; padding: 16px; }
+  .card { background: white; border-radius: 10px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  label { display: block; margin: 10px 0 4px; font-weight: 600; }
+  input, select { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #b9c7c1; border-radius: 8px; }
+  .btn { margin-top: 14px; width: 100%; padding: 13px; background: #0b6b4d; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+  .btn.danger { background: #b3261e; width: auto; padding: 6px 10px; margin: 0; font-size: 14px; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e3ebe7; }
+  .row:last-child { border-bottom: none; }
+  .rank { background: #0b6b4d; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px; }
+  .dist { font-weight: bold; color: #0b6b4d; }
+  .muted { color: #6a7b74; font-size: 14px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<header>⚽ Désignations arbitres - Béjaïa</header>
+<div class="tabs">
+  <button id="tabDesig" class="active" onclick="showTab('desig')">Désignation</button>
+  <button id="tabArb" onclick="showTab('arb')">Arbitres</button>
+</div>
+
+<main>
+  <!-- ONGLET DESIGNATION -->
+  <section id="desig">
+    <div class="card">
+      <label for="stade">Choisis le stade</label>
+      <select id="stade" onchange="calculer()"></select>
+    </div>
+    <div class="card">
+      <strong>Arbitres les plus proches</strong>
+      <div id="resultats" class="muted">Choisis un stade.</div>
+    </div>
+  </section>
+
+  <!-- ONGLET ARBITRES -->
+  <section id="arb" class="hidden">
+    <div class="card">
+      <strong>Ajouter un arbitre</strong>
+      <label for="nom">Nom et prénom</label>
+      <input id="nom" type="text" placeholder="Ex : Karim Benali">
+      <label for="commune">Commune de résidence</label>
+      <select id="commune"></select>
+      <button class="btn" onclick="ajouterArbitre()">Enregistrer</button>
+    </div>
+    <div class="card">
+      <strong>Liste des arbitres</strong>
+      <div id="listeArbitres"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+// Coordonnées approximatives (latitude, longitude). À vérifier et corriger si besoin.
+const COMMUNES = {
+  "Béjaïa centre": [36.7509, 5.0567],
+  "Oued Ghir": [36.7000, 5.0000],
+  "Tichy": [36.6750, 5.0990],
+  "Aokas": [36.6430, 5.2490],
+  "Souk El Tenine": [36.6900, 5.3000],
+  "Amizour": [36.6400, 4.9010],
+  "El Kseur": [36.6800, 4.8450],
+  "Barbacha": [36.6000, 4.8800],
+  "Akbou": [36.4570, 4.5330],
+  "Sidi Aïch": [36.6100, 4.6860],
+  "Seddouk": [36.5200, 4.6700],
+  "Kherrata": [36.4950, 5.2700],
+  "Timezrit": [36.6000, 4.7500],
+  "Toudja": [36.6900, 5.0000],
+  "Tazmalt": [36.3900, 4.4100],
+  "Melbou": [36.6350, 5.3600]
+};
+
+// Coordonnées approximatives des stades. À modifier avec les vrais stades.
+const STADES = {
+  "Stade de l'Unité Maghrébine (Béjaïa)": [36.7440, 5.0750],
+  "Stade Léo Lagrange (Béjaïa)": [36.7530, 5.0600],
+  "Stade d'Amizour": [36.6420, 4.9030],
+  "Stade d'El Kseur": [36.6820, 4.8480],
+  "Stade d'Akbou": [36.4600, 4.5360],
+  "Stade de Sidi Aïch": [36.6130, 4.6890],
+  "Stade d'Aokas": [36.6460, 5.2520],
+  "Stade de Kherrata": [36.4980, 5.2730]
+};
+
+function distanceKm(a, b) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b[0] - a[0]) * rad, dLon = (b[1] - a[1]) * rad;
+  const x = Math.sin(dLat / 2) ** 2 +
+            Math.cos(a[0] * rad) * Math.cos(b[0] * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
+function charger() { return JSON.parse(localStorage.getItem("arbitres") || "[]"); }
+function sauver(l) { localStorage.setItem("arbitres", JSON.stringify(l)); }
+
+function remplirListes() {
+  document.getElementById("stade").innerHTML =
+    Object.keys(STADES).map(s => `<option>${s}</option>`).join("");
+  document.getElementById("commune").innerHTML =
+    Object.keys(COMMUNES).map(c => `<option>${c}</option>`).join("");
+}
+
+function showTab(t) {
+  document.getElementById("desig").classList.toggle("hidden", t !== "desig");
+  document.getElementById("arb").classList.toggle("hidden", t !== "arb");
+  document.getElementById("tabDesig").classList.toggle("active", t === "desig");
+  document.getElementById("tabArb").classList.toggle("active", t === "arb");
+  if (t === "desig") calculer(); else afficherArbitres();
+}
+
+function ajouterArbitre() {
+  const nom = document.getElementById("nom").value.trim();
+  const commune = document.getElementById("commune").value;
+  if (!nom) { alert("Entre un nom."); return; }
+  const l = charger();
+  l.push({ nom, commune });
+  sauver(l);
+  document.getElementById("nom").value = "";
+  afficherArbitres();
+}
+
+function supprimer(i) {
+  const l = charger();
+  l.splice(i, 1);
+  sauver(l);
+  afficherArbitres();
+}
+
+function afficherArbitres() {
+  const l = charger();
+  const div = document.getElementById("listeArbitres");
+  if (!l.length) { div.innerHTML = '<p class="muted">Aucun arbitre enregistré.</p>'; return; }
+  div.innerHTML = l.map((a, i) =>
+    `<div class="row"><div><strong>${a.nom}</strong><br><span class="muted">${a.commune}</span></div>` +
+    `<button class="btn danger" onclick="supprimer(${i})">Supprimer</button></div>`).join("");
+}
+
+function calculer() {
+  const stade = document.getElementById("stade").value;
+  const l = charger();
+  const div = document.getElementById("resultats");
+  if (!l.length) { div.innerHTML = "Aucun arbitre enregistré. Va dans l'onglet Arbitres."; return; }
+  const classes = l.map(a => ({ ...a, d: distanceKm(COMMUNES[a.commune], STADES[stade]) }))
+                   .sort((x, y) => x.d - y.d);
+  div.innerHTML = classes.map((a, i) =>
+    `<div class="row"><div><span class="rank">${i + 1}</span><strong>${a.nom}</strong>` +
+    `<br><span class="muted">${a.commune}</span></div><span class="dist">${a.d.toFixed(1)} km</span></div>`).join("");
+}
+
+remplirListes();
+calculer();
+</script>
+</body>
+</html>
